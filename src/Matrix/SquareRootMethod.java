@@ -1,14 +1,11 @@
-import Matrix.Matrix;
-
-/**
- * Created by User on 23.10.2016.
- */
+package Matrix;
 public class SquareRootMethod {
     private Matrix aMatrix;
     private Matrix tMatrix;
     private Matrix transposedTMatrix;
     private Matrix fVector;
     private Matrix xVector;
+    private Matrix yVector;
 
     public SquareRootMethod(double[][] matrix, double[][] fVect) {
         aMatrix = new Matrix(matrix);
@@ -16,6 +13,7 @@ public class SquareRootMethod {
         transposedTMatrix = new Matrix(aMatrix.getRows(), aMatrix.getColumns());
         tMatrix = new Matrix(aMatrix.getRows(), aMatrix.getColumns());
         xVector = new Matrix(fVector.getRows(), 1);
+        yVector = new Matrix(fVector.getRows(), 1);
     }
 
     public void symmetricalTransformation() {
@@ -27,8 +25,14 @@ public class SquareRootMethod {
     public void print() {
         aMatrix.print();
         System.out.println();
-        tMatrix.print();
+        fVector.print();
         System.out.println();
+        yVector.print();
+        System.out.println();
+        xVector.print();
+        Matrix residualVector = new Matrix(aMatrix.multiply(xVector));
+        residualVector.substract(fVector);
+        residualVector.print();
     }
 
     public void findTMatrix() {
@@ -46,15 +50,40 @@ public class SquareRootMethod {
                     double difference = aMatrix.get(i, i) - sum;
                     tMatrix.set(i, i, Math.sqrt(difference));
                 }
-                if (j > i){
+                if (j > i) {
                     double sum = 0;
                     for (int k = 0; k <= i - 1; ++k) {
                         sum += tMatrix.get(k, i) * tMatrix.get(k, j);
                     }
-                    double difference = aMatrix.get(i,j) - sum;
-                    tMatrix.set(i,j,difference/tMatrix.get(i,i));
+                    double difference = aMatrix.get(i, j) - sum;
+                    tMatrix.set(i, j, difference / tMatrix.get(i, i));
                 }
             }
+        }
+        transposedTMatrix = Matrix.transpone(tMatrix);
+    }
+
+    public void findYVector() {
+        yVector.set(0, 0, fVector.get(0, 0) / tMatrix.get(0, 0));
+        for (int i = 1; i < aMatrix.getRows(); ++i) {
+            double sum = 0;
+            for (int k = 0; k <= i - 1; ++k) {
+                sum += tMatrix.get(k, i) * yVector.get(k, 0);
+            }
+            double difference = fVector.get(i, 0) - sum;
+            yVector.set(i, 0, difference / tMatrix.get(i, i));
+        }
+    }
+
+    public void findSolution() {
+        xVector.set(xVector.getRows() - 1, 0, yVector.get(yVector.getRows() - 1, 0) / tMatrix.get(yVector.getRows() - 1, yVector.getRows() - 1));
+        for (int i = aMatrix.getRows() - 1; i >= 0; --i) {
+            double sum = 0;
+            for (int k = i + 1; k <= xVector.getRows() - 1; ++k) {
+                sum += tMatrix.get(i, k) * xVector.get(k, 0);
+            }
+            double difference = yVector.get(i, 0) - sum;
+            xVector.set(i, 0, difference / tMatrix.get(i, i));
         }
     }
 }
