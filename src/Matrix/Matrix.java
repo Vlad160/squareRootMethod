@@ -1,5 +1,7 @@
 package Matrix;
 
+import java.util.Formatter;
+
 /**
  * Created by User on 18.10.2016.
  */
@@ -31,12 +33,22 @@ public class Matrix {
                 matrix[i][j] = matr[i][j];
         }
     }
-
+    public Matrix(Matrix matrix1) {
+        rows = matrix1.getRows();
+        columns = matrix1.getColumns();
+        matrix = new Double[rows][columns];
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j)
+                matrix[i][j] = matrix1.get(i,j);
+        }
+    }
 
     public void print() {
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
-                System.out.print(matrix[i][j] + " ");
+                Formatter fmt = new Formatter();
+                fmt.format("%5.4g", matrix[i][j]);
+                System.out.print(fmt + " ");
             }
             System.out.println();
         }
@@ -99,14 +111,12 @@ public class Matrix {
     public void set(int row, int column, double item) {
         matrix[row][column] = item;
     }
-    public Double get(int row, int column){
-        
-    }
-    public static double[][] transpone(double[][] matrix1) {
-        double[][] tmp = new double[matrix1[0].length][matrix1.length];
-        for (int i = 0; i < matrix1[0].length; i++) {
-            for (int j = 0; j < matrix1.length; j++) {
-                tmp[i][j] = matrix1[j][i];
+
+    public static Matrix transpone(Matrix matrix1) {
+        Matrix tmp = new Matrix(matrix1.getRows(),matrix1.getColumns());
+        for (int i = 0; i <matrix1.getRows(); i++) {
+            for (int j = 0; j < matrix1.getColumns(); j++) {
+                tmp.set(i,j,matrix1.get(j,i));
             }
         }
         return tmp;
